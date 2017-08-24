@@ -1,0 +1,28 @@
+{
+  "name": "circledisc",
+  "version": "0.0.1",
+  "description": "CircleCI > Discord webhook",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClaraIO/CircleDisc.git"
+  },
+  "keywords": [
+    "circleci",
+    "discord",
+    "webhook"
+  ],
+  "author": "noud02",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ClaraIO/CircleDisc/issues"
+  },
+  "homepage": "https://github.com/ClaraIO/CircleDisc#readme",
+  "optionalDependencies": {
+    "bluebird": "^3.5.0",
+    "eventemitter3": "^2.0.3"
+  }
+}
