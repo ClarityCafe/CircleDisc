@@ -46,7 +46,7 @@ class CircleDisc extends EventEmitter {
     }
 
     _onRequest(req, res) {
-        if (req.method !== "POST" && req.url !== "/hooks/circleci" || req.) {
+        if (req.method !== "POST" && req.url !== "/hooks/circleci") {
             // REEEEEE
             res.write("<img src='https://cdn.frankerfacez.com/emoticon/61193/4'>");
             res.end();
