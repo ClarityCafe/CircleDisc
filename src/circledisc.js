@@ -85,7 +85,8 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0x7fff3f,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`
+                        name: `${payload.username}/${payload.reponame}`,
+                        url: payload.vcs_url
                     }
                 }]
             }
@@ -96,7 +97,50 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0xff3f3f,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`
+                        name: `${payload.username}/${payload.reponame}`,
+                        url: payload.vcs_url
+                    }
+                }]
+            }
+
+            case "infrastructure_fail": {
+                return [{
+                    title: "Build Infrastructure Failed",
+                    url: payload.build_url,
+                    description: desc,
+                    color: 0xff3f3f,
+                    author: {
+                        name: `${payload.username}/${payload.reponame}`,
+                        url: payload.vcs_url
+                    }
+                }]
+            }
+
+            case "canceled": {
+                return [{
+                    title: "Build Canceled",
+                    url: payload.build_url,
+                    description: desc,
+                    color: 0xff3f3f,
+                    author: {
+                        name: `${payload.username}/${payload.reponame}`,
+                        url: payload.vcs_url
+                    }
+                }]
+            }
+
+            case "timedout": {
+                return [{
+                    title: "Build Timed out",
+                    url: payload.build_url,
+                    description: desc,
+                    author: {
+                        name: `${payload.username}/${payload.reponame}`,
+                        url: payload.vcs_url
+                    }            case "no_tests": {
+                        return [{
+                            title: ""
+                        }]
                     }
                 }]
             }
@@ -108,7 +152,8 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0xfffff,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`
+                        name: `${payload.username}/${payload.reponame}`,
+                        url: payload.vcs_url
                     }
                 }]
             }
