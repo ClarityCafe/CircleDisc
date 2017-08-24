@@ -1,0 +1,4 @@
+.gitignore
+.codeclimate.yml
+.eslintrc.json
+example
