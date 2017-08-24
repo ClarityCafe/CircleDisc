@@ -36,6 +36,7 @@ class CircleDisc extends EventEmitter {
         port = port || 8080;
         if (port instanceof http.Server) {
             this.server = port;
+            this.server.on("request", (req, res) => this._onRequest(req, res));
         } else {
             this.server = http.createServer((req, res) => this._onRequest(req, res));
             this.server.listen(port, "0.0.0.0");
@@ -45,7 +46,10 @@ class CircleDisc extends EventEmitter {
     }
 
     _onRequest(req, res) {
-        if (req.method !== "POST" && req.url !== "/hooks/circleci") {
+        if (req.method !== "POST" && req.url !== "/hooks/circleci" || req.) {
+            // REEEEEE
+            res.write("<img src='https://cdn.frankerfacez.com/emoticon/61193/4'>");
+            res.end();
             return;
         }
 
