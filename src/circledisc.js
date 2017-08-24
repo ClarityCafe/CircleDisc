@@ -137,10 +137,6 @@ class CircleDisc extends EventEmitter {
                     author: {
                         name: `${payload.username}/${payload.reponame}`,
                         url: payload.vcs_url
-                    }            case "no_tests": {
-                        return [{
-                            title: ""
-                        }]
                     }
                 }]
             }
