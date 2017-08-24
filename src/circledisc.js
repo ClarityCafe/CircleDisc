@@ -53,13 +53,13 @@ class CircleDisc extends EventEmitter {
             return;
         }
 
-        let body = "";
+        let body = [];
 
         req.on("data", (chunk) => {
-            body = JSON.parse(chunk.toString());
-        });;
+            body.push(chunk);
+        }).on("end", () => {
 
-        req.on("end", () => {
+            body = Buffer.concat(body).toString();
 
             res.write("OK")
             res.end();
