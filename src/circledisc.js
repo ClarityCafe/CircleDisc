@@ -15,14 +15,10 @@ try {
 }
 
 /**
-<<<<<<< HEAD
- * Creates a new CircleCI webhook instance
-=======
  * Main class.
  * 
  * @class CircleDisc
  * @extends {EventEmitter}
->>>>>>> 662ad2840af603a5d7210f5bb0d937cdcb99040e
  */
 class CircleDisc extends EventEmitter {
 
@@ -72,17 +68,8 @@ class CircleDisc extends EventEmitter {
             this._execHook(body.payload);
         });
     }
-<<<<<<< HEAD
-    /**
-     * gets the result of the payload
-     * @param {Object} payload
-     * @returns {Object} the payload to be sent to Discord 
-     */
-    _getResultEmbed (payload) {
-=======
 
     _getResultEmbed(payload) {
->>>>>>> 662ad2840af603a5d7210f5bb0d937cdcb99040e
 
         const desc = `\`${payload.vcs_revision.substring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`
 
@@ -124,15 +111,7 @@ class CircleDisc extends EventEmitter {
         }
     }
 
-<<<<<<< HEAD
-    /**
-     * Execs a new Payload to Discord
-     * @param {Object} payload 
-     */
-    _execHook (payload) {
-=======
     _execHook(payload) {
->>>>>>> 662ad2840af603a5d7210f5bb0d937cdcb99040e
         if (!payload) {
             return;
         }
@@ -140,13 +119,9 @@ class CircleDisc extends EventEmitter {
         const data = {
             avatar_url: "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png",
             username: "CircleCI",
-<<<<<<< HEAD
-            embeds: [this._getResultEmbed(payload)]
-=======
             embeds: this._getResultEmbed(payload),
             tts: false,
             content: null
->>>>>>> 662ad2840af603a5d7210f5bb0d937cdcb99040e
         }
 
         const req = https.request({
