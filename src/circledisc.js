@@ -1,5 +1,5 @@
 const http = require("http");
-const url = require("url");
+const https = require("https");
 let { EventEmitter } = require("events");
 
 try {
@@ -14,62 +14,68 @@ try {
     // EventEmitter3 not found, ignoring
 }
 
+/**
+ * Main class.
+ * 
+ * @class CircleDisc
+ * @extends {EventEmitter}
+ */
 class CircleDisc extends EventEmitter {
 
-    constructor (id, token, port) {
+    /**
+     * Creates an instance of CircleDisc.
+     * @param {any} id 
+     * @param {any} token 
+     * @param {any} port 
+     * @memberof CircleDisc
+     */
+    constructor(id, token, port) {
         super();
         this.id = id;
         this.token = token;
+        port = port || 8080;
         if (port instanceof http.Server) {
             this.server = port;
         } else {
             this.server = http.createServer((req, res) => this._onRequest(req, res));
-            this.server.listen(port);
+            this.server.listen(port, "0.0.0.0");
         }
 
         this.server.once("listening", () => this.emit("listening", this.server));
     }
 
-    _onRequest (req, res) {
-        if (req.method !== "POST" && url.parse(req.url).pathname !== "/hooks/circleci") {
+    _onRequest(req, res) {
+        if (req.method !== "POST" && req.url !== "/hooks/circleci") {
             return;
         }
 
         let body = "";
 
-        req.on("data", function (chunk) {
-            console.log(chunk);
-            body += chunk;
-        })
+        req.on("data", (chunk) => {
+            body = JSON.parse(chunk.toString());
+        });;
 
-        req.on("end", function () {
+        req.on("end", () => {
 
-            try {
-                body = JSON.parse(body);
-            } catch (e) {
+            res.write("OK")
+            res.end();
+
+            if (!body || !body.hasOwnProperty("payload")) {
                 return;
             }
 
-            res.end();
+            this.emit("buildComplete", body.payload);
+            this._execHook(body.payload);
         });
-
-        if (!body.hasOwnProperty("payload")) {
-            return;
-        }
-
-        console.log(body);
-        
-        this.emit("buildComplete", body.payload);
-        this._execHook(body.payload);
     }
 
-    _getResultEmbed (payload) {
+    _getResultEmbed(payload) {
 
-        const desc = `\`${payload.vcs_revision.susbtring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`
+        const desc = `\`${payload.vcs_revision.substring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`
 
         switch (payload.outcome) {
             case "success": {
-                return {
+                return [{
                     title: "Build Success",
                     url: payload.build_url,
                     description: desc,
@@ -77,10 +83,10 @@ class CircleDisc extends EventEmitter {
                     author: {
                         name: `${payload.username}/${payload.reponame}`
                     }
-                }
+                }]
             }
             case "failed": {
-                return {
+                return [{
                     title: "Build Failed",
                     url: payload.build_url,
                     description: desc,
@@ -88,12 +94,24 @@ class CircleDisc extends EventEmitter {
                     author: {
                         name: `${payload.username}/${payload.reponame}`
                     }
-                }
+                }]
+            }
+
+            default: {
+                return [{
+                    title: "Unknown result",
+                    url: payload.build_url,
+                    description: desc,
+                    color: 0xfffff,
+                    author: {
+                        name: `${payload.username}/${payload.reponame}`
+                    }
+                }]
             }
         }
     }
 
-    _execHook (payload) {
+    _execHook(payload) {
         if (!payload) {
             return;
         }
@@ -101,10 +119,12 @@ class CircleDisc extends EventEmitter {
         const data = {
             avatar_url: "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png",
             username: "CircleCI",
-            embeds: [this._getResultEmbed(payload)]
+            embeds: this._getResultEmbed(payload),
+            tts: false,
+            content: null
         }
 
-        const req = http.request({
+        const req = https.request({
             protocol: "https:",
             hostname: "discordapp.com",
             path: `/api/v6/webhooks/${this.id}/${this.token}?wait=true`,
@@ -116,7 +136,7 @@ class CircleDisc extends EventEmitter {
         }, (res) => {
             res.setEncoding("utf8");
             res.on("data", (chunk) => {
-                console.log(chunk);
+                this.emit("webhookSent", chunk);
             });
         });
 
