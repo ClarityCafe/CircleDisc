@@ -1,0 +1,14 @@
+engines:
+  eslint:
+    enabled: true
+    config: .eslintrc.json
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  fixme:
+    enabled: true
+ratings:
+  paths:
+  - src/**.js
