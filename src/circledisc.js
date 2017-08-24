@@ -31,7 +31,7 @@ class CircleDisc extends EventEmitter {
     }
 
     _onRequest (req, res) {
-        if (req.method !== "POST" && utl.parse(req.url).pathname !== "/hooks/circleci") {
+        if (req.method !== "POST" && url.parse(req.url).pathname !== "/hooks/circleci") {
             return;
         }
 
@@ -58,7 +58,8 @@ class CircleDisc extends EventEmitter {
         }
 
         console.log(body);
-
+        
+        this.emit("buildComplete", body.payload);
         this._execHook(body.payload);
     }
 
@@ -100,7 +101,7 @@ class CircleDisc extends EventEmitter {
         const data = {
             avatar_url: "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png",
             username: "CircleCI",
-            embeds: [this._getResultEmbed(payload)];
+            embeds: [this._getResultEmbed(payload)]
         }
 
         const req = http.request({
