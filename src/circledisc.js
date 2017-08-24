@@ -14,6 +14,9 @@ try {
     // EventEmitter3 not found, ignoring
 }
 
+/**
+ * Creates a new CircleCI webhook instance
+ */
 class CircleDisc extends EventEmitter {
 
     constructor (id, token, port) {
@@ -61,7 +64,11 @@ class CircleDisc extends EventEmitter {
 
         this._execHook(body.payload);
     }
-
+    /**
+     * gets the result of the payload
+     * @param {Object} payload
+     * @returns {Object} the payload to be sent to Discord 
+     */
     _getResultEmbed (payload) {
 
         const desc = `\`${payload.vcs_revision.susbtring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`
@@ -92,6 +99,10 @@ class CircleDisc extends EventEmitter {
         }
     }
 
+    /**
+     * Execs a new Payload to Discord
+     * @param {Object} payload 
+     */
     _execHook (payload) {
         if (!payload) {
             return;
@@ -100,7 +111,7 @@ class CircleDisc extends EventEmitter {
         const data = {
             avatar_url: "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png",
             username: "CircleCI",
-            embeds: [this._getResultEmbed(payload)];
+            embeds: [this._getResultEmbed(payload)]
         }
 
         const req = http.request({
