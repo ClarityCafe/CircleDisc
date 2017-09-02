@@ -1,15 +1,26 @@
 # CircleDisc
 
-CircleCI > Discord webhook
+CI -> Discord made easier.
 
-### Usage
+## Usage
 
 ```js
-const hook = new(require('circledisc'))('id', 'token', 8080);
+const CircleDisc = require('circledisc');
+
+const hook = new CircleDisc('id', 'token', 8080);
+
+hook.on("listening", () => console.log("Listening!"));
+
 ```
 
-``id`` the Webhook's ID 
+``id`` Webhook ID
 
-``token`` the Webhook's token
+``token`` Webhook token
 
 ``port/server`` the port/http server to use
+
+## Supported CIs
+
+- [x] AppVeyor
+- [x] CircleCI
+- [ ] Travis

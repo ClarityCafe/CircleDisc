@@ -2,3 +2,4 @@
 .codeclimate.yml
 .eslintrc.json
 example
+test

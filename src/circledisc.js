@@ -46,8 +46,8 @@ class CircleDisc extends EventEmitter {
     }
 
     _onRequest(req, res) {
-        if (req.method !== "POST" && req.url !== "/hooks/circleci") {
-            // REEEEEE
+        if (req.method !== "POST") {
+            // REEEEEEE
             res.write("<img src='https://cdn.frankerfacez.com/emoticon/61193/4'>");
             res.end();
             return;
@@ -64,16 +64,72 @@ class CircleDisc extends EventEmitter {
             res.write("OK")
             res.end();
 
-            if (!body || !body.hasOwnProperty("payload")) {
+            if (!body) {
                 return;
             }
 
-            this.emit("buildComplete", body.payload);
-            this._execHook(body.payload);
+            switch (req.url) {
+                case "/hooks/circleci": {
+                    this.emit("buildComplete", body, "CircleCI");
+                    this.execHook(this._getCircleEmbed(body.payload), this._getAvatar("circleci"), this._getUsername("circleci"));
+                    break;
+                }
+                case "/hooks/appveyor": {
+                    this.emit("buildComplete", body, "AppVeyor");
+                    this.execHook(this._getAppVeyorEmbed(body), this._getAvatar("appveyor"), this._getUsername("appveyor"));
+                    break;
+                }
+                default: {
+                    res.write("<img src=\"https://cdn.frankerfacez.com/emoticon/61193/4\">");
+                    res.end();
+                }
+            }
         });
     }
 
-    _getResultEmbed(payload) {
+    _getAppVeyorEmbed(body) {
+        const desc = `\`${body.eventData.commitId.substring(0, 7)}\` ${body.eventData.commitMessage} - ${body.eventData.commitAuthor}`;
+
+        console.log(body.eventName);
+
+        switch (true) {
+            case body.eventData.passed: {
+                return [{
+                    title: "Build Success",
+                    url: body.eventData.buildUrl,
+                    description: desc,
+                    color: 0x7fff3f,
+                    author: {
+                        name: `${body.eventData.repositoryName}:${body.eventData.branch}`
+                    }
+                }];
+            }
+            case body.eventData.failed: {
+                return [{
+                    title: "Build Failed",
+                    url: body.eventData.buildUrl,
+                    description: desc,
+                    color: 0xff3f3f,
+                    author: {
+                        name: `${body.eventData.repositoryName}:${body.eventData.branch}`
+                    }
+                }];
+            }
+            default: {
+                return [{
+                    title: "Unknown result",
+                    url: body.eventData.buildUrl,
+                    description: desc,
+                    color: 0xfffff,
+                    author: {
+                        name: `${body.eventData.repositoryName}:${body.eventData.branch}`
+                    }
+                }];
+            }
+        }
+    }
+
+    _getCircleEmbed(payload) {
 
         const desc = `\`${payload.vcs_revision.substring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`
 
@@ -85,10 +141,10 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0x7fff3f,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`,
+                        name: `${payload.username}/${payload.reponame}:${payload.branch}`,
                         url: payload.vcs_url
                     }
-                }]
+                }];
             }
             case "failed": {
                 return [{
@@ -97,10 +153,10 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0xff3f3f,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`,
+                        name: `${payload.username}/${payload.reponame}:${payload.branch}`,
                         url: payload.vcs_url
                     }
-                }]
+                }];
             }
 
             case "infrastructure_fail": {
@@ -110,10 +166,10 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0xff3f3f,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`,
+                        name: `${payload.username}/${payload.reponame}:${payload.branch}`,
                         url: payload.vcs_url
                     }
-                }]
+                }];
             }
 
             case "canceled": {
@@ -123,10 +179,10 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0xff3f3f,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`,
+                        name: `${payload.username}/${payload.reponame}:${payload.branch}`,
                         url: payload.vcs_url
                     }
-                }]
+                }];
             }
 
             case "timedout": {
@@ -135,10 +191,10 @@ class CircleDisc extends EventEmitter {
                     url: payload.build_url,
                     description: desc,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`,
+                        name: `${payload.username}/${payload.reponame}:${payload.branch}`,
                         url: payload.vcs_url
                     }
-                }]
+                }];
             }
 
             default: {
@@ -148,23 +204,60 @@ class CircleDisc extends EventEmitter {
                     description: desc,
                     color: 0xfffff,
                     author: {
-                        name: `${payload.username}/${payload.reponame}`,
+                        name: `${payload.username}/${payload.reponame}:${payload.branch}`,
                         url: payload.vcs_url
                     }
-                }]
+                }];
             }
         }
     }
 
-    _execHook(payload) {
-        if (!payload) {
+    _getAvatar(type) {
+        switch (type.toLowerCase()) {
+            case "appveyor": {
+                return "https://www.appveyor.com/assets/img/appveyor-logo-256.png";
+            }
+            case "circleci": {
+                return "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png";
+            }
+            default: {
+                return "https://cdn.frankerfacez.com/emoticon/61193/4";
+            }
+        }
+    }
+
+    _getUsername(type) {
+        switch (type.toLowerCase()) {
+            case "appveyor": {
+                return "AppVeyor";
+            }
+            case "circleci": {
+                return "CircleCI";
+            }
+            default: {
+                return "Unknown CI"
+            }
+        }
+    }
+
+    /**
+     * Execute the webhook
+     * 
+     * @param {embed} embed 
+     * @param {string} avatar 
+     * @param {string} username 
+     * @returns 
+     * @memberof CircleDisc
+     */
+    execHook(embed, avatar, username) {
+        if (!embed) {
             return;
         }
 
         const data = {
-            avatar_url: "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png",
-            username: "CircleCI",
-            embeds: this._getResultEmbed(payload),
+            avatar_url: avatar,
+            username: username,
+            embeds: embed,
             tts: false,
             content: null
         }
@@ -175,7 +268,7 @@ class CircleDisc extends EventEmitter {
             path: `/api/v6/webhooks/${this.id}/${this.token}?wait=true`,
             method: "POST",
             headers: {
-                "User-Agent": "CircleDisc (https://github.com/ClaraIO/CircleDisc, v0.0.1)",
+                "User-Agent": `CircleDisc (https://github.com/ClaraIO/CircleDisc, ${require("../package.json").version})`,
                 "Content-Type": "application/json"
             }
         }, (res) => {
