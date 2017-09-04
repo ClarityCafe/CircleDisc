@@ -1,5 +1,4 @@
-.gitignore
-.codeclimate.yml
-.eslintrc.json
+## these are the files we don't want on the package
+
+node_modules
 example
-test
