@@ -12,7 +12,6 @@
             "jsx": false
         }
     },
-
     "ignore": [
         "*.min.js"
     ],
@@ -70,7 +69,7 @@
                     "string": "String",
                     "number": "Number",
                     "boolean": "Boolean",
-                    "rromise": "Promise",
+                    "promise": "Promise",
                     "array": "Array",
                     "undefined":" Undefined",
                     "null": "Null",
