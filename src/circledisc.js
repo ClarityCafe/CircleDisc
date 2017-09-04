@@ -42,7 +42,7 @@ class CircleDisc extends EventEmitter {
             this.server.listen(port, '0.0.0.0');
         }
 
-        this.server.once('listening', () => this.emit(`listening to ${this.server}`));
+        this.server.once('listening', () => this.emit('listening'. this.server));
     }
 
     _onRequest(req, res) {
