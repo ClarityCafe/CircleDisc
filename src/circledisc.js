@@ -33,7 +33,7 @@ class CircleDisc extends EventEmitter {
         super();
         this.id = id;
         this.token = token;
-        port = port || 8080;
+        this.port = port || 8080;
         if (port instanceof http.Server) {
             this.server = port;
             this.server.on("request", (req, res) => this._onRequest(req, res));
