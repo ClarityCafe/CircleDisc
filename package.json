@@ -1,6 +1,6 @@
 {
   "name": "circledisc",
-  "version": "0.1.",
+  "version": "0.1.0",
   "description": "CircleCI > Discord webhook",
   "main": "index.js",
   "scripts": {
