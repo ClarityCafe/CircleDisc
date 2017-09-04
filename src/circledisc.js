@@ -1,15 +1,15 @@
-const http = require("http");
-const https = require("https");
-let { EventEmitter } = require("events");
+const http = require('http');
+const https = require('https');
+let { EventEmitter } = require('events');
 
 try {
-    global.Promise = require("bluebird");
+    global.Promise = require('bluebird');
 } catch (e) {
     // Bluebird not found, ignoring
 }
 
 try {
-    EventEmitter = require("eventemitter3");
+    EventEmitter = require('eventemitter3');
 } catch (e) {
     // EventEmitter3 not found, ignoring
 }
@@ -36,32 +36,32 @@ class CircleDisc extends EventEmitter {
         this.port = port || 8080;
         if (port instanceof http.Server) {
             this.server = port;
-            this.server.on("request", (req, res) => this._onRequest(req, res));
+            this.server.on('request', (req, res) => this._onRequest(req, res));
         } else {
             this.server = http.createServer((req, res) => this._onRequest(req, res));
-            this.server.listen(port, "0.0.0.0");
+            this.server.listen(port, '0.0.0.0');
         }
 
-        this.server.once("listening", () => this.emit("listening", this.server));
+        this.server.once('listening', () => this.emit(`listening to ${this.server}`));
     }
 
     _onRequest(req, res) {
-        if (req.method !== "POST") {
+        if (req.method !== 'POST') {
             // REEEEEEE
-            res.write("<img src='https://cdn.frankerfacez.com/emoticon/61193/4'>");
+            res.write('<img src="https://cdn.frankerfacez.com/emoticon/61193/4">');
             res.end();
             return;
         }
 
         let body = [];
 
-        req.on("data", (chunk) => {
+        req.on('data', (chunk) => {
             body.push(chunk);
-        }).on("end", () => {
+        }).on('end', () => {
 
             body = JSON.parse(Buffer.concat(body).toString());
 
-            res.write("OK")
+            res.write('OK');
             res.end();
 
             if (!body) {
@@ -69,18 +69,18 @@ class CircleDisc extends EventEmitter {
             }
 
             switch (req.url) {
-                case "/hooks/circleci": {
-                    this.emit("buildComplete", body, "CircleCI");
-                    this.execHook(this._getCircleEmbed(body.payload), this._getAvatar("circleci"), this._getUsername("circleci"));
+                case '/hooks/circleci': {
+                    this.emit('buildComplete', body, 'CircleCI');
+                    this.execHook(this._getCircleEmbed(body.payload), this._getAvatar('circleci'), this._getUsername('circleci'));
                     break;
                 }
-                case "/hooks/appveyor": {
-                    this.emit("buildComplete", body, "AppVeyor");
-                    this.execHook(this._getAppVeyorEmbed(body), this._getAvatar("appveyor"), this._getUsername("appveyor"));
+                case '/hooks/appveyor': {
+                    this.emit('buildComplete', body, 'AppVeyor');
+                    this.execHook(this._getAppVeyorEmbed(body), this._getAvatar('appveyor'), this._getUsername('appveyor'));
                     break;
                 }
                 default: {
-                    res.write("<img src=\"https://cdn.frankerfacez.com/emoticon/61193/4\">");
+                    res.write('<img src=\'https://cdn.frankerfacez.com/emoticon/61193/4\'>');
                     res.end();
                 }
             }
@@ -95,7 +95,7 @@ class CircleDisc extends EventEmitter {
         switch (true) {
             case body.eventData.passed: {
                 return [{
-                    title: "Build Success",
+                    title: 'Build Success',
                     url: body.eventData.buildUrl,
                     description: desc,
                     color: 0x7fff3f,
@@ -106,7 +106,7 @@ class CircleDisc extends EventEmitter {
             }
             case body.eventData.failed: {
                 return [{
-                    title: "Build Failed",
+                    title: 'Build Failed',
                     url: body.eventData.buildUrl,
                     description: desc,
                     color: 0xff3f3f,
@@ -117,7 +117,7 @@ class CircleDisc extends EventEmitter {
             }
             default: {
                 return [{
-                    title: "Unknown result",
+                    title: 'Unknown result',
                     url: body.eventData.buildUrl,
                     description: desc,
                     color: 0xfffff,
@@ -131,12 +131,12 @@ class CircleDisc extends EventEmitter {
 
     _getCircleEmbed(payload) {
 
-        const desc = `\`${payload.vcs_revision.substring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`
+        const desc = `\`${payload.vcs_revision.substring(0, 7)}\` ${payload.subject} - ${payload.committer_name}`;
 
         switch (payload.outcome) {
-            case "success": {
+            case 'success': {
                 return [{
-                    title: "Build Success",
+                    title: 'Build Success',
                     url: payload.build_url,
                     description: desc,
                     color: 0x7fff3f,
@@ -146,9 +146,9 @@ class CircleDisc extends EventEmitter {
                     }
                 }];
             }
-            case "failed": {
+            case 'failed': {
                 return [{
-                    title: "Build Failed",
+                    title: 'Build Failed',
                     url: payload.build_url,
                     description: desc,
                     color: 0xff3f3f,
@@ -159,9 +159,9 @@ class CircleDisc extends EventEmitter {
                 }];
             }
 
-            case "infrastructure_fail": {
+            case 'infrastructure_fail': {
                 return [{
-                    title: "Build Infrastructure Failed",
+                    title: 'Build Infrastructure Failed',
                     url: payload.build_url,
                     description: desc,
                     color: 0xff3f3f,
@@ -172,9 +172,9 @@ class CircleDisc extends EventEmitter {
                 }];
             }
 
-            case "canceled": {
+            case 'canceled': {
                 return [{
-                    title: "Build Canceled",
+                    title: 'Build Canceled',
                     url: payload.build_url,
                     description: desc,
                     color: 0xff3f3f,
@@ -185,9 +185,9 @@ class CircleDisc extends EventEmitter {
                 }];
             }
 
-            case "timedout": {
+            case 'timedout': {
                 return [{
-                    title: "Build Timed out",
+                    title: 'Build Timed out',
                     url: payload.build_url,
                     description: desc,
                     author: {
@@ -199,7 +199,7 @@ class CircleDisc extends EventEmitter {
 
             default: {
                 return [{
-                    title: "Unknown result",
+                    title: 'Unknown result',
                     url: payload.build_url,
                     description: desc,
                     color: 0xfffff,
@@ -214,28 +214,28 @@ class CircleDisc extends EventEmitter {
 
     _getAvatar(type) {
         switch (type.toLowerCase()) {
-            case "appveyor": {
-                return "https://www.appveyor.com/assets/img/appveyor-logo-256.png";
+            case 'appveyor': {
+                return 'https://www.appveyor.com/assets/img/appveyor-logo-256.png';
             }
-            case "circleci": {
-                return "https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png";
+            case 'circleci': {
+                return 'https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png';
             }
             default: {
-                return "https://cdn.frankerfacez.com/emoticon/61193/4";
+                return 'https://cdn.frankerfacez.com/emoticon/61193/4';
             }
         }
     }
 
     _getUsername(type) {
         switch (type.toLowerCase()) {
-            case "appveyor": {
-                return "AppVeyor";
+            case 'appveyor': {
+                return 'AppVeyor';
             }
-            case "circleci": {
-                return "CircleCI";
+            case 'circleci': {
+                return 'CircleCI';
             }
             default: {
-                return "Unknown CI"
+                return 'Unknown CI';
             }
         }
     }
@@ -260,26 +260,26 @@ class CircleDisc extends EventEmitter {
             embeds: embed,
             tts: false,
             content: null
-        }
+        };
 
         const req = https.request({
-            protocol: "https:",
-            hostname: "discordapp.com",
+            protocol: 'https:',
+            hostname: 'discordapp.com',
             path: `/api/v6/webhooks/${this.id}/${this.token}?wait=true`,
-            method: "POST",
+            method: 'POST',
             headers: {
-                "User-Agent": `CircleDisc (https://github.com/ClaraIO/CircleDisc, ${require("../package.json").version})`,
-                "Content-Type": "application/json"
+                'User-Agent': `CircleDisc (https://github.com/ClaraIO/CircleDisc, ${require('../package.json').version})`,
+                'Content-Type': 'application/json'
             }
         }, (res) => {
-            res.setEncoding("utf8");
-            res.on("data", (chunk) => {
-                this.emit("webhookSent", chunk);
+            res.setEncoding('utf8');
+            res.on('data', (chunk) => {
+                this.emit('webhookSent', chunk);
             });
         });
 
-        req.on("error", (e) => {
-            console.error("Got an error while trying to execute webhook:", e.message);
+        req.on('error', (e) => {
+            console.error('Got an error while trying to execute webhook:', e.message);
         });
 
         req.write(JSON.stringify(data));
