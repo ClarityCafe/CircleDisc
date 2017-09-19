@@ -236,6 +236,7 @@ class CircleDisc extends EventEmitter {
     }
 
     _getTravisEmbed(body) {
+        body = JSON.parse(body);
         console.log(body);
         const desc = `\`${body.commit.substring(0, 7)}\` ${body.message} - ${body.author_name}`;
 
