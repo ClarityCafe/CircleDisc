@@ -1,5 +1,6 @@
 const http = require('http');
 const https = require('https');
+const qs = require('querystring');
 let { EventEmitter } = require('events');
 
 try {
@@ -70,7 +71,11 @@ class CircleDisc extends EventEmitter {
             body.push(chunk);
         }).on('end', () => {
 
-            body = JSON.parse(Buffer.concat(body).toString());
+            if (req.headers['Content-Type'] === 'application/json') {
+                body = JSON.parse(Buffer.concat(body).toString());
+            } else if (req.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+                body = qs.parse(Buffer.concat(body).toString());
+            }
 
             res.write('OK');
             res.end();
@@ -91,7 +96,7 @@ class CircleDisc extends EventEmitter {
                     break;
                 }
                 case '/hooks/travisci': {
-                    this.emit('buildComplete', body, 'TravisCI');
+                    this.emit('buildComplete', body.payload, 'TravisCI');
                     this.execHook(this._getTravisEmbed(body), this._getAvatar('travisci'), this._getUsername('travisci'));
                     break;
                 }
