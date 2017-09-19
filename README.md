@@ -23,9 +23,15 @@ hook.on("listening", () => console.log("Listening!"));
 
 ``port/server`` the port/http server to use
 
-
 ## Supported CIs
 
 - [x] AppVeyor
 - [x] CircleCI
 - [x] Travis
+
+## TODO
+
+- [ ] Add Wrecker support
+- [ ] Fully support all states on AppVeyor builds
+- [ ] Fully support all states on Travis builds
+- [ ] Add support for plugins
