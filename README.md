@@ -28,4 +28,4 @@ hook.on("listening", () => console.log("Listening!"));
 
 - [x] AppVeyor
 - [x] CircleCI
-- [ ] Travis
+- [x] Travis
