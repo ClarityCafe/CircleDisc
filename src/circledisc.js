@@ -98,8 +98,8 @@ class CircleDisc extends EventEmitter {
                     break;
                 }
                 case '/hooks/travisci': {
-                    this.emit('buildComplete', body, 'TravisCI');
-                    this.execHook(this._getTravisEmbed(body), this._getAvatar('travisci'), this._getUsername('travisci'));
+                    this.emit('buildComplete', body.payload, 'TravisCI');
+                    this.execHook(this._getTravisEmbed(body.payload), this._getAvatar('travisci'), this._getUsername('travisci'));
                     break;
                 }
                 default: {
