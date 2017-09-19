@@ -79,6 +79,11 @@ class CircleDisc extends EventEmitter {
                     this.execHook(this._getAppVeyorEmbed(body), this._getAvatar('appveyor'), this._getUsername('appveyor'));
                     break;
                 }
+                case '/hooks/travisci': {
+                    this.emit('buildComplete', body, 'TravisCI');
+                    this.execHook(this._getTravisEmbed(body), this._getAvatar('travisci'), this._getUsername('travisci'));
+                    break;
+                }
                 default: {
                     res.write('<img src=\'https://cdn.frankerfacez.com/emoticon/61193/4\'>');
                     res.end();
@@ -212,6 +217,61 @@ class CircleDisc extends EventEmitter {
         }
     }
 
+    _getTravisEmbed(body) {
+        const desc = `\`${body.commit.substring(0, 7)}\` ${body.message} - ${body.author_name}`;
+
+        switch (body.state) {
+            case 'passed': {
+                return [{
+                    title: 'Build Success',
+                    url: body.build_url,
+                    description: desc,
+                    color: 0x7fff3f,
+                    author: {
+                        name: `${body.repository.owner_name}/${body.repository.name}:${body.branch}`,
+                        url: body.repository.url
+                    }
+                }];
+            }
+            case 'failed': {
+                return [{
+                    title: 'Build Failed',
+                    url: body.build_url,
+                    description: desc,
+                    color: 0xff3f3f,
+                    author: {
+                        name: `${body.repository.owner_name}/${body.repository.name}:${body.branch}`,
+                        url: body.repository.url
+                    }
+                }];
+            }
+            case 'errored': {
+                return [{
+                    title: 'Build Errored',
+                    url: body.build_url,
+                    description: desc,
+                    color: 0xff3f3f,
+                    author: {
+                        name: `${body.repository.owner_name}/${body.repository.name}:${body.branch}`,
+                        url: body.repository.url
+                    }
+                }];
+            }
+            default: {
+                return [{
+                    title: `Unknown Result: ${body.status_message} (state = ${body.state})`,
+                    url: body.build_url,
+                    description: desc,
+                    color: 0xfffff,
+                    author: {
+                        name: `${body.repository.owner_name}/${body.repository.name}:${body.branch}`,
+                        url: body.repository.url
+                    }
+                }];
+            }
+        }
+    }
+
     _getAvatar(type) {
         switch (type.toLowerCase()) {
             case 'appveyor': {
@@ -219,6 +279,9 @@ class CircleDisc extends EventEmitter {
             }
             case 'circleci': {
                 return 'https://d3r49iyjzglexf.cloudfront.net/components/default/illu_hero-home-54f5aa459a11db1e8e53633518212a559f743f442df9fdc2c4cecb6854635f90.png';
+            }
+            case 'travisci': {
+                return 'https://travis-ci.org/images/logos/TravisCI-Mascot-1.png';
             }
             default: {
                 return 'https://cdn.frankerfacez.com/emoticon/61193/4';
@@ -233,6 +296,9 @@ class CircleDisc extends EventEmitter {
             }
             case 'circleci': {
                 return 'CircleCI';
+            }
+            case 'travisci': {
+                return 'Travis CI';
             }
             default: {
                 return 'Unknown CI';
@@ -268,7 +334,7 @@ class CircleDisc extends EventEmitter {
             path: `/api/v6/webhooks/${this.id}/${this.token}?wait=true`,
             method: 'POST',
             headers: {
-                'User-Agent': `CircleDisc (https://github.com/ClaraIO/CircleDisc, ${require('../package.json').version})`,
+                'User-Agent': `CircleDisc (https://github.com/ClarityMoe/CircleDisc, ${require('../package.json').version})`,
                 'Content-Type': 'application/json'
             }
         }, (res) => {
