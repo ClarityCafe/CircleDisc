@@ -1,7 +1,7 @@
 {
   "name": "circledisc",
   "version": "0.1.1",
-  "description": "CircleCI > Discord webhook",
+  "description": "CI > Discord, made easier",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
