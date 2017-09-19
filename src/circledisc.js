@@ -31,9 +31,20 @@ class CircleDisc extends EventEmitter {
      */
     constructor(id, token, port) {
         super();
+
+        if (!port && (token instanceof http.Server || typeof token === 'number')) {
+            const regex = /discordapp\.com\/api\/webhooks\/(\d+)\/([^/]+)/i;
+            const url = id;
+
+            port = token;
+            id = url.match(regex)[1];
+            token = url.match(regex)[2];
+        }
+
         this.id = id;
         this.token = token;
         this.port = port || 8080;
+
         if (port instanceof http.Server) {
             this.server = port;
             this.server.on('request', (req, res) => this._onRequest(req, res));
@@ -42,7 +53,7 @@ class CircleDisc extends EventEmitter {
             this.server.listen(port, '0.0.0.0');
         }
 
-        this.server.once('listening', () => this.emit('listening'. this.server));
+        this.server.once('listening', () => this.emit('listening', this.server));
     }
 
     _onRequest(req, res) {
