@@ -71,9 +71,11 @@ class CircleDisc extends EventEmitter {
             body.push(chunk);
         }).on('end', () => {
 
-            if (req.headers['Content-Type'] === 'application/json') {
+            console.log(req.headers['content-type']);
+
+            if (req.headers['content-type'].startsWith('application/json')) {
                 body = JSON.parse(Buffer.concat(body).toString());
-            } else if (req.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+            } else if (req.headers['content-type'].startsWith('application/x-www-form-urlencoded')) {
                 body = qs.parse(Buffer.concat(body).toString());
             }
 
@@ -96,7 +98,7 @@ class CircleDisc extends EventEmitter {
                     break;
                 }
                 case '/hooks/travisci': {
-                    this.emit('buildComplete', body.payload, 'TravisCI');
+                    this.emit('buildComplete', body, 'TravisCI');
                     this.execHook(this._getTravisEmbed(body), this._getAvatar('travisci'), this._getUsername('travisci'));
                     break;
                 }
