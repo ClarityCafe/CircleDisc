@@ -98,6 +98,7 @@ class CircleDisc extends EventEmitter {
                     break;
                 }
                 case '/hooks/travisci': {
+                    body.payload = JSON.parse(body.payload);
                     this.emit('buildComplete', body.payload, 'TravisCI');
                     this.execHook(this._getTravisEmbed(body.payload), this._getAvatar('travisci'), this._getUsername('travisci'));
                     break;
@@ -236,8 +237,6 @@ class CircleDisc extends EventEmitter {
     }
 
     _getTravisEmbed(body) {
-        body = JSON.parse(body);
-        console.log(body);
         const desc = `\`${body.commit.substring(0, 7)}\` ${body.message} - ${body.author_name}`;
 
         switch (body.state) {
