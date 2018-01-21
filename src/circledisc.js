@@ -297,7 +297,7 @@ class CircleDisc extends EventEmitter {
                 return 'https://www.appveyor.com/assets/img/appveyor-logo-256.png';
             }
             case 'circleci': {
-                return 'https://pantheon.io/sites/default/files/field/image/LaU6tv2_.png';
+                return 'https://d3r49iyjzglexf.cloudfront.net/logo-circleci-blog-e378a4db441e1ec3e15d50e9a356232eea65929d97d639b02fdefb4e45ea6fa4.png';
             }
             case 'travisci': {
                 return 'https://travis-ci.org/images/logos/TravisCI-Mascot-1.png';
