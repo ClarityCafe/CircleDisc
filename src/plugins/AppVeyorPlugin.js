@@ -11,8 +11,8 @@ class AppVeyor extends BasePlugin {
                 commitMessage: body.eventData.commitMessage,
                 status: body.eventData.status,
                 url: body.eventData.buildUrl,
-                repository: body.eventData.repositoryName.split('/')[0],
-                repositoryOwner: body.eventData.repositoryName.split('/')[1],
+                repositoryOwner: body.eventData.repositoryName.split('/')[0],
+                repository: body.eventData.repositoryName.split('/')[1],
                 branch: body.eventData.branch
             })
         };
