@@ -3,7 +3,18 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const qs = require('querystring');
-const {EventEmitter} = require('events');
+
+let {EventEmitter} = require('events');
+
+try {
+    global.Promise = require('bluebird');
+} catch(e) {
+}
+
+try {
+    EventEmitter = require('eventemitter3');
+} catch(e) {
+}
 
 class CircleDisc extends EventEmitter {
     constructor(url, port) {
