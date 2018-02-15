@@ -1,7 +1,6 @@
 # CircleDisc
 
-CI -> Discord made easier.
-
+Zero dependency CI -> Discord webhook server.
 
 ## Usage
 
