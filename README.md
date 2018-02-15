@@ -8,22 +8,13 @@ CI -> Discord made easier.
 ```js
 const CircleDisc = require('circledisc');
 
-const hook = new CircleDisc('id', 'token', 8080);
+const hook = new CircleDisc('url', 1337 /* can also be a http server */);
 
-// OR
-
-const hook = new CircleDisc(url, 8080) // you can replace the port with a HTTP server here too
-
-hook.on("listening", () => console.log("Listening!"));
+hook.on('ready', () => console.log("Ready!"));
 
 ```
 
-
-``url`` Webhook URL
-
-``port/server`` the port/http server to use
-
-## Supported CIs
+## Supported Services
 
 - [x] AppVeyor
 - [x] CircleCI
@@ -31,7 +22,7 @@ hook.on("listening", () => console.log("Listening!"));
 
 ## TODO
 
-- [ ] Add Wrecker support
+- [ ] Add Wercker support
 - [ ] Fully support all states on AppVeyor builds
 - [ ] Fully support all states on Travis builds
-- [ ] Add support for plugins
+- [x] Add support for plugins
