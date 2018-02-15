@@ -11,8 +11,8 @@ class Circle extends BasePlugin {
                 commitMessage: body.subject,
                 status: body.status,
                 url: body.build_url,
-                repository: body.vcs_url.substring(8).split('/')[1],
-                repositoryOwner: body.vcs_url.substring(8).split('/')[2],
+                repository: body.reponame,
+                repositoryOwner: body.username,
                 branch: body.branch
             })
         };
