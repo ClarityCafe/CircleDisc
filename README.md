@@ -10,6 +10,8 @@ const CircleDisc = require('circledisc');
 
 const hook = new CircleDisc('url', 1337 /* can also be a http server */);
 
+hook.startListening();
+
 hook.on('ready', () => console.log("Ready!"));
 
 ```

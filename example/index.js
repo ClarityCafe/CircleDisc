@@ -1,18 +1,8 @@
-const CircleDisc = require("../");
+const CircleDisc = require('../');
 
-const hook = new CircleDisc("id", "token", 5600);
+const client = new CircleDisc('url', process.env.PORT);
 
-hook.once("listening", () => {
-    console.log("Ready!");
-});
+client.startListening();
 
-hook.on("buildComplete", (body, type) => {
-    switch (type.toLowerCase()) {
-        case "appveyor": {
-            return console.log("Build", body.eventData.buildNumber, "on AppVeyor completed!");
-        }
-        case "circleci": {
-            return console.log("Build", body.payload.build_num, "on CircleCI completed!");
-        }
-    }
-})
+client.once('ready', () => console.log('Ready!'));
+
