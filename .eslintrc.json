@@ -12,7 +12,7 @@
         },
         "ignore": [
             "*.min.js"
-        ],
+        ]
     },
     "rules": {
         "no-console": 0,
