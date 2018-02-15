@@ -1,6 +1,6 @@
 const CircleDisc = require('../');
 
-const client = new CircleDisc('url', process.env.PORT);
+const client = new CircleDisc(process.env.URL, process.env.PORT);
 
 client.startListening();
 
