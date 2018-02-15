@@ -172,6 +172,8 @@ class CircleDisc extends EventEmitter {
                             );
                         })
                         .catch(err => {
+                            console.error(err);
+
                             res.end(
                                 JSON.stringify({
                                     error: true,
