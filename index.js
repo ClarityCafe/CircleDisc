@@ -1,1 +1,1 @@
-module.exports = require("./src/circledisc.js");
+module.exports = require("./src/CircleDisc");
