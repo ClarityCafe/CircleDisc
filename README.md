@@ -20,6 +20,7 @@ hook.on('ready', () => console.log("Ready!"));
 - [x] AppVeyor
 - [x] CircleCI
 - [x] Travis
+- [x] Docker
 
 ## TODO
 
