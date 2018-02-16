@@ -8,12 +8,12 @@ let {EventEmitter} = require('events');
 
 try {
     global.Promise = require('bluebird');
-} catch(e) {
+} catch(e) { // eslint-disable no-empty
 }
 
 try {
     EventEmitter = require('eventemitter3');
-} catch(e) {
+} catch(e) { // eslint-disable no-empty
 }
 
 class CircleDisc extends EventEmitter {
@@ -53,6 +53,8 @@ class CircleDisc extends EventEmitter {
 
             this.plugins[plugin.name.toLowerCase()] = plugin.execute;
         }
+
+        this.emit('pluginsLoaded', this.plugins);
     }
 
     startListening() {
@@ -93,13 +95,13 @@ class CircleDisc extends EventEmitter {
             }, res => {
                 res.setEncoding('utf8');
                 res.on('data', chunk => {
-                    this.emit('requestCompleted', chunk);
+                    this.emit('requestData', chunk);
                     resolve();
                 });
             });
 
             req.on('error', e => {
-                console.error(`Cought an error while trying to send data to Discord: ${e.message}`);
+                this.emit('error', e);
                 reject(e.message);
             });
 
@@ -129,11 +131,13 @@ class CircleDisc extends EventEmitter {
 
         let body = [];
 
-        req.on('error', console.error);
+        req.on('error', e => this.emit('error', e));
 
         req
             .on('data', chunk => body.push(chunk))
             .once('end', () => {
+                this.emit('request', body);
+
                 switch (path[0]) {
                 case 'webhook': {
                     if (!path[1] || !this.plugins.hasOwnProperty(path[1])) {
@@ -154,16 +158,22 @@ class CircleDisc extends EventEmitter {
                         );
                     }
 
+                    const rawBody = body;
+
                     if (req.headers['content-type'].startsWith('application/json')) {
                         body = JSON.parse(Buffer.concat(body).toString());
                     } else if (req.headers['content-type'].startsWith('application/x-www-form-urlencoded')) {
                         body = qs.parse(Buffer.concat(body).toString());
                     }
 
+                    this.emit('build', path[1], body, rawBody);
+
                     const exec = this.plugins[path[1]];
 
                     this._sendRequest(exec(body))
                         .then(() => {
+                            this.emit('requestComplete');
+
                             res.end(
                                 JSON.stringify({
                                     error: false,
@@ -172,7 +182,7 @@ class CircleDisc extends EventEmitter {
                             );
                         })
                         .catch(err => {
-                            console.error(err);
+                            this.emit('error', err);
 
                             res.end(
                                 JSON.stringify({
