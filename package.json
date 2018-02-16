@@ -1,6 +1,6 @@
 {
   "name": "circledisc",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Zero dependency CI -> Discord webhook server.",
   "main": "index.js",
   "scripts": {
