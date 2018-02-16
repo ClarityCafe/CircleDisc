@@ -1,6 +1,43 @@
 const BasePlugin = require('../BasePlugin');
+const https = require('https');
+const crypto = require('crypto');
 
 class Travis extends BasePlugin {
+    static verify(req, body) {
+        return new Promise((resolve, reject) => {
+            if (!req.headers.hasOwnProperty('signature')) {
+                return reject();
+            }
+
+            const buf = Buffer.from(req.headers.signature, 'base64');
+            const sig = buf.toString();
+
+            https.request({
+                protocol: 'https:',
+                hostname: 'api.travis-ci.org',
+                path: `/config`,
+                method: 'GET',
+                headers: {
+                    'User-Agent': `CircleDisc (https://github.com/ClarityMoe/CircleDisc, ${require('../../package.json').version})`
+                }
+            }, res => {
+                res.setEncoding('utf8');
+                let data = [];
+
+                res
+                    .on('data', chunk => { data = chunk; })
+                    .once('end', () => {
+                        data = JSON.parse(data);
+                        const pubkey = data.config.notifications.webhook.public_key;
+                        const verifier = crypto.createVerify('sha1');
+
+                        verifier.update(body);
+                        verifier.verify(pubkey, sig) ? resolve() : reject();
+                    });
+            }).end();
+        });
+    }
+
     static execute(body) {
         const payload = JSON.parse(body.payload);
 
