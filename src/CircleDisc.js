@@ -51,7 +51,7 @@ class CircleDisc extends EventEmitter {
                 continue;
             }
 
-            this.plugins[plugin.name.toLowerCase()] = plugin.execute;
+            this.plugins[plugin.name.toLowerCase()] = plugin;
         }
 
         this.emit('pluginsLoaded', this.plugins);
@@ -119,6 +119,7 @@ class CircleDisc extends EventEmitter {
         }
 
         if (req.method !== 'POST') {
+            res.writeHead(405);
             return res.end(
                 JSON.stringify({
                     error: true,
@@ -141,6 +142,7 @@ class CircleDisc extends EventEmitter {
                 switch (path[0]) {
                 case 'webhook': {
                     if (!path[1] || !this.plugins.hasOwnProperty(path[1])) {
+                        res.writeHead(404);
                         return res.end(
                             JSON.stringify({
                                 error: true,
@@ -150,6 +152,7 @@ class CircleDisc extends EventEmitter {
                     }
 
                     if (!req.headers.hasOwnProperty('content-type')) {
+                        res.writeHead(400);
                         return res.end(
                             JSON.stringify({
                                 error: true,
@@ -168,12 +171,23 @@ class CircleDisc extends EventEmitter {
 
                     this.emit('build', path[1], body, rawBody);
 
-                    const exec = this.plugins[path[1]];
+                    if (!this.plugins[path[1]].isValid(req)) {
+                        res.writeHead(401);
+                        return res.end(
+                            JSON.stringify({
+                                error: true,
+                                message: 'Unauthorized'
+                            })
+                        );
+                    }
+
+                    const exec = this.plugins[path[1]].execute;
 
                     this._sendRequest(exec(body))
                         .then(() => {
                             this.emit('requestComplete');
 
+                            res.writeHead(200);
                             res.end(
                                 JSON.stringify({
                                     error: false,
@@ -184,6 +198,7 @@ class CircleDisc extends EventEmitter {
                         .catch(err => {
                             this.emit('error', err);
 
+                            res.writeHead(200);
                             res.end(
                                 JSON.stringify({
                                     error: true,
@@ -196,6 +211,7 @@ class CircleDisc extends EventEmitter {
                 }
 
                 default: {
+                    res.writeHead(404);
                     res.end(
                         JSON.stringify({
                             error: true,

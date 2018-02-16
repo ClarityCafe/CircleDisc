@@ -62,6 +62,10 @@ class BasePlugin {
         };
     }
 
+    static isValid(req) { // eslint-disable-line no-unused-vars
+        return true;
+    }
+
     static execute(body) {
         return {
             service: 'Unnamed',
