@@ -1,4 +1,5 @@
 const http = require('http');
+
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -161,7 +162,7 @@ class CircleDisc extends EventEmitter {
                         );
                     }
 
-                    const rawBody = body;
+                    const rawBody = Buffer.concat(body).toString();
 
                     if (req.headers['content-type'].startsWith('application/json')) {
                         body = JSON.parse(Buffer.concat(body).toString());
@@ -171,38 +172,39 @@ class CircleDisc extends EventEmitter {
 
                     this.emit('build', path[1], body, rawBody);
 
-                    if (!this.plugins[path[1]].isValid(req)) {
-                        res.writeHead(401);
-                        return res.end(
-                            JSON.stringify({
-                                error: true,
-                                message: 'Unauthorized'
-                            })
-                        );
-                    }
-
-                    const exec = this.plugins[path[1]].execute;
-
-                    this._sendRequest(exec(body))
+                    this.plugins[path[1]]
+                        .verify(req, rawBody)
                         .then(() => {
-                            this.emit('requestComplete');
+                            this._sendRequest(this.plugins[path[1]].execute(body))
+                                .then(() => {
+                                    this.emit('requestComplete');
 
-                            res.writeHead(200);
-                            res.end(
-                                JSON.stringify({
-                                    error: false,
-                                    message: 'OK'
+                                    res.writeHead(200);
+                                    res.end(
+                                        JSON.stringify({
+                                            error: false,
+                                            message: 'OK'
+                                        })
+                                    );
                                 })
-                            );
+                                .catch(err => {
+                                    this.emit('error', err);
+    
+                                    res.writeHead(200);
+                                    res.end(
+                                        JSON.stringify({
+                                            error: true,
+                                            message: err
+                                        })
+                                    );
+                                });
                         })
-                        .catch(err => {
-                            this.emit('error', err);
-
-                            res.writeHead(200);
+                        .catch(() => {
+                            res.writeHead(401);
                             res.end(
                                 JSON.stringify({
                                     error: true,
-                                    message: err
+                                    message: 'Unauthorized'
                                 })
                             );
                         });

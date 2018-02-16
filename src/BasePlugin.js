@@ -62,8 +62,8 @@ class BasePlugin {
         };
     }
 
-    static isValid(req) { // eslint-disable-line no-unused-vars
-        return true;
+    static verify(req, body) { // eslint-disable-line no-unused-vars
+        return Promise.resolve();
     }
 
     static execute(body) {
