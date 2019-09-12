@@ -1,7 +1,7 @@
 const BasePlugin = require('../BasePlugin');
 
 class Codacy extends BasePlugin {
-    static generateEmbed(body) {
+    generateEmbed(body) {
         let color = 0xFFFFFF;
         let status = 'Unknown';
 
@@ -21,11 +21,11 @@ class Codacy extends BasePlugin {
         };
     }
 
-    static execute(body) {
+    execute(body) {
         return {
             service: 'Codacy',
             logo: 'https://p14.zdassets.com/hc/settings_assets/960438/200158055/j2MxqjmX2ar8LeC06jBR8g-S_B_Big.png',
-            embed: Codacy.generateEmbed(body)
+            embed: this.generateEmbed(body)
         };
     }
 }

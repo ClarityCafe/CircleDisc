@@ -1,11 +1,11 @@
 const BasePlugin = require('../BasePlugin');
 
 class AppVeyor extends BasePlugin {
-    static execute(body) {
+    execute(body) {
         return {
             logo: 'https://www.appveyor.com/assets/img/appveyor-logo-256.png',
             service: 'AppVeyor',
-            embed: BasePlugin.generateEmbed({
+            embed: this.generateEmbed({
                 commitAuthor: body.eventData.commitAuthor,
                 commitId: body.eventData.commitId,
                 commitMessage: body.eventData.commitMessage,

@@ -1,11 +1,11 @@
 const BasePlugin = require('../BasePlugin');
 
 class Docker extends BasePlugin {
-    static execute(body) {
+    execute(body) {
         return {
             logo: 'https://secure.gravatar.com/avatar/7510e100f7ebeca4a0b8c3c617349295.jpg?s=1024',
             service: 'Docker',
-            embed: BasePlugin.generateEmbed({
+            embed: this.generateEmbed({
                 description: body.repository.full_description,
                 repository: body.repository.name,
                 repositoryOwner: body.repository.owner,

@@ -1,9 +1,10 @@
 const http = require('http');
-
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const qs = require('querystring');
+
+const BasePlugin = require('./BasePlugin');
 
 let {EventEmitter} = require('events');
 
@@ -46,9 +47,9 @@ class CircleDisc extends EventEmitter {
         const files = fs.readdirSync(path.join(__dirname, dir)).filter(f => f.endsWith('.js'));
 
         for (const file of files) {
-            const plugin = require(path.join(__dirname, dir, file));
+            const plugin = new (require(path.join(__dirname, dir, file)))();
 
-            if (!plugin.hasOwnProperty('execute') || !plugin.name) {
+            if (!(plugin instanceof BasePlugin) || !plugin.hasOwnProperty('execute') || !plugin.name) {
                 continue;
             }
 
@@ -90,7 +91,7 @@ class CircleDisc extends EventEmitter {
                 path: `/api/v6/webhooks/${this.id}/${this.token}?wait=true`,
                 method: 'POST',
                 headers: {
-                    'User-Agent': `CircleDisc (https://github.com/ClarityMoe/CircleDisc, ${require('../package.json').version})`,
+                    'User-Agent': `CircleDisc (https://github.com/ClarityCafe/CircleDisc, ${require('../package.json').version})`,
                     'Content-Type': 'application/json'
                 }
             }, res => {
@@ -141,86 +142,86 @@ class CircleDisc extends EventEmitter {
                 this.emit('request', body);
 
                 switch (path[0]) {
-                case 'webhook': {
-                    if (!path[1] || !this.plugins.hasOwnProperty(path[1])) {
-                        res.writeHead(404);
-                        return res.end(
-                            JSON.stringify({
-                                error: true,
-                                message: 'Invalid service'
-                            })
-                        );
-                    }
-
-                    if (!req.headers.hasOwnProperty('content-type')) {
-                        res.writeHead(400);
-                        return res.end(
-                            JSON.stringify({
-                                error: true,
-                                message: 'Content-Type header is not set'
-                            })
-                        );
-                    }
-
-                    const rawBody = Buffer.concat(body).toString();
-
-                    if (req.headers['content-type'].startsWith('application/json')) {
-                        body = JSON.parse(Buffer.concat(body).toString());
-                    } else if (req.headers['content-type'].startsWith('application/x-www-form-urlencoded')) {
-                        body = qs.parse(Buffer.concat(body).toString());
-                    }
-
-                    this.emit('build', path[1], body, rawBody);
-
-                    this.plugins[path[1]]
-                        .verify(req, rawBody)
-                        .then(() => {
-                            this._sendRequest(this.plugins[path[1]].execute(body))
-                                .then(() => {
-                                    this.emit('requestComplete');
-
-                                    res.writeHead(200);
-                                    res.end(
-                                        JSON.stringify({
-                                            error: false,
-                                            message: 'OK'
-                                        })
-                                    );
-                                })
-                                .catch(err => {
-                                    this.emit('error', err);
-    
-                                    res.writeHead(200);
-                                    res.end(
-                                        JSON.stringify({
-                                            error: true,
-                                            message: err
-                                        })
-                                    );
-                                });
-                        })
-                        .catch(() => {
-                            res.writeHead(401);
-                            res.end(
+                    case 'webhook': {
+                        if (path.length < 2 || !path[1] || !this.plugins.hasOwnProperty(path[1])) {
+                            res.writeHead(404);
+                            return res.end(
                                 JSON.stringify({
                                     error: true,
-                                    message: 'Unauthorized'
+                                    message: 'Invalid service'
                                 })
                             );
-                        });
+                        }
 
-                    break;
-                }
+                        if (!req.headers.hasOwnProperty('content-type')) {
+                            res.writeHead(400);
+                            return res.end(
+                                JSON.stringify({
+                                    error: true,
+                                    message: 'Content-Type header is not set'
+                                })
+                            );
+                        }
 
-                default: {
-                    res.writeHead(404);
-                    res.end(
-                        JSON.stringify({
-                            error: true,
-                            message: `Invalid endpoint ${path[0]}`
-                        })
-                    );
-                }
+                        const rawBody = Buffer.concat(body).toString();
+
+                        if (req.headers['content-type'].startsWith('application/json')) {
+                            body = JSON.parse(Buffer.concat(body).toString());
+                        } else if (req.headers['content-type'].startsWith('application/x-www-form-urlencoded')) {
+                            body = qs.parse(Buffer.concat(body).toString());
+                        }
+
+                        this.emit('build', path[1], body, rawBody);
+
+                        this.plugins[path[1]]
+                            .verify(req, rawBody)
+                            .then(() => {
+                                this._sendRequest(this.plugins[path[1]].execute(body))
+                                    .then(() => {
+                                        this.emit('requestComplete');
+
+                                        res.writeHead(200);
+                                        res.end(
+                                            JSON.stringify({
+                                                error: false,
+                                                message: 'OK'
+                                            })
+                                        );
+                                    })
+                                    .catch(err => {
+                                        this.emit('error', err);
+        
+                                        res.writeHead(200);
+                                        res.end(
+                                            JSON.stringify({
+                                                error: true,
+                                                message: err
+                                            })
+                                        );
+                                    });
+                            })
+                            .catch(() => {
+                                res.writeHead(401);
+                                res.end(
+                                    JSON.stringify({
+                                        error: true,
+                                        message: 'Unauthorized'
+                                    })
+                                );
+                            });
+
+                        break;
+                    }
+
+                    default: {
+                        res.writeHead(404);
+                        res.end(
+                            JSON.stringify({
+                                error: true,
+                                message: `Invalid endpoint ${path[0]}`
+                            })
+                        );
+                    }
                 }
             });
     }

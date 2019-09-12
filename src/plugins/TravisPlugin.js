@@ -3,7 +3,7 @@ const https = require('https');
 const crypto = require('crypto');
 
 class Travis extends BasePlugin {
-    static verify(req, body) {
+    verify(req, body) {
         return new Promise((resolve, reject) => {
             if (!req.headers.hasOwnProperty('signature')) {
                 return reject();
@@ -38,13 +38,13 @@ class Travis extends BasePlugin {
         });
     }
 
-    static execute(body) {
+    execute(body) {
         const payload = JSON.parse(body.payload);
 
         return {
             service: 'Travis CI',
             logo: 'https://travis-ci.org/images/logos/TravisCI-Mascot-1.png',
-            embed: BasePlugin.generateEmbed({
+            embed: this.generateEmbed({
                 commitId: payload.commit,
                 commitMessage: payload.message,
                 commitAuthor: payload.author_name,

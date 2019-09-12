@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ClarityMoe/CircleDisc.git"
+    "url": "git+https://github.com/ClarityCafe/CircleDisc.git"
   },
   "keywords": [
     "circleci",
@@ -17,12 +17,12 @@
     "discord",
     "webhook"
   ],
-  "author": "noud02",
+  "author": "yuwui",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ClarityMoe/CircleDisc/issues"
+    "url": "https://github.com/ClarityCafe/CircleDisc/issues"
   },
-  "homepage": "https://github.com/ClarityMoe/CircleDisc#readme",
+  "homepage": "https://github.com/ClarityCafe/CircleDisc#readme",
   "optionalDependencies": {
     "bluebird": "latest",
     "eventemitter3": "latest"
